@@ -5,6 +5,7 @@ class Stop
 	{
 		this.stop = 'stop';
 	}
+	static instance = new Stop();
 }
 
 export default Stop;

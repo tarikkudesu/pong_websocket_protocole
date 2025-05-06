@@ -5,6 +5,7 @@ class Start
 	{
 		this.start = 'start';
 	}
+	static instance = new Start();
 }
 
 export default Start;

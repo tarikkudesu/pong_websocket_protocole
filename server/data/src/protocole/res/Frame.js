@@ -1,3 +1,6 @@
+import Ball from '../game/Ball.js';
+import Paddle from '../game/Paddle.js';
+import Vector from '../game/Vector.js';
 
 class Frame
 {
@@ -28,6 +31,11 @@ class Frame
 		this.leftPaddleBottomX = Math.ceil(leftPaddle.end.x);
 		this.leftPaddleBottomY = Math.ceil(leftPaddle.end.y);
 	}
+	static instance = new Frame(
+		new Ball({ pos: new Vector(0, 0), radius: 0, velocity: new Vector(0, 0) }),
+		new Paddle({ start: new Vector(0, 0), end: new Vector(0, 0), radius: 0, constrains: new Vector(0, 0) }),
+		new Paddle({ start: new Vector(0, 0), end: new Vector(0, 0), radius: 0, constrains: new Vector(0, 0) })
+	);
 }
 
 export default Frame;

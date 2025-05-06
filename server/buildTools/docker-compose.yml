@@ -3,9 +3,6 @@ services:
     build: .
     container_name: server
     image: web_app:tar
-    ports:
-      - target: 9000
-        published: 9000
     volumes:
       - "${PWD}/data:/home/data"
     env_file:
