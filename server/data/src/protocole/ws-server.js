@@ -1,7 +1,7 @@
-import Message from './Message.js';
-import WSError from './WSError.js';
+import Message from './shared/Message.js';
+import WSError from './shared/WSError.js';
 
-import Pooler from './res/Pooler.js';
+import Pooler from './res/Pool.js';
 import Frame from './res/Frame.js';
 import Start from './res/Start.js';
 import Score from './res/Score.js';
@@ -16,6 +16,7 @@ import Hook from './req/Hook.js';
 import Play from './req/Play.js';
 
 import _ from 'lodash';
+import Invitations from './res/Invitations.js';
 
 class WS {
 	static #insance;
@@ -32,6 +33,7 @@ class WS {
 	Message = Message;
 	WSError = WSError;
 
+	Invitation = Invitations;
 	Pooler = Pooler;
 	Frame = Frame;
 	Start = Start;
@@ -75,7 +77,11 @@ class WS {
 	}
 	PoolMessage(getPoolers)
 	{
-		return JSON.stringify(new Message({ event: 'pool', object: getPoolers() }));
+		return JSON.stringify(new Message({ event: 'pool', object: new Pool(getPoolers()) }));
+	}
+	InvitationMessage(getInvitions)
+	{
+		return JSON.stringify(new Message({ event: 'invitations', object: new Invitations(getInvitions()) }));
 	}
 	WonMessage()
 	{

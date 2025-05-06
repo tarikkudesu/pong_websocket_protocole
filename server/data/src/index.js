@@ -37,11 +37,11 @@ console.log('---------------------------------------------------');
 
 // ! Pool -----------------------------------------------------------
 message = WS.PoolMessage(function() {
-	return new WS.Pool([
+	return [
 		{username: 'salam', profile: 'salam'},
 		{username: 'kalam', profile: 'kalam'},
 		{username: '3alam', profile: '3alam'}
-	]);
+	];
 });
 messageJson = WS.Json({message: message, target: WS.Message.instance});
 console.log(messageJson);
