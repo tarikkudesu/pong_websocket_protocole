@@ -1,7 +1,7 @@
-import Message from './Message.js';
-import WSError from './WSError.js';
+import Message from './shared/Message.js';
+import WSError from './shared/WSError.js';
 
-import Pooler from './req/Pooler.js';
+import Pooler from './req/Pool.js';
 import Frame from './req/Frame.js';
 import Start from './req/Start.js';
 import Score from './req/Score.js';
@@ -17,21 +17,18 @@ import Play from './res/Play.js';
 
 import _ from 'lodash';
 
-interface JsonProps
-{
+interface JsonProps {
 	message: string;
 	target: Object;
 }
 
-class WS
-{
+class WS {
 	private static instance: WS | null;
-	constructor()
-	{
+	constructor() {
 		if (WS.instance) return WS.instance;
 		WS.instance = this;
 	}
-	
+
 	// * connect, invite, play, hook
 
 	// ? Protocole Classes
@@ -51,38 +48,31 @@ class WS
 	Invite = Invite;
 	Play = Play;
 	Hook = Hook;
-	
+
 	// ? Comminication Helpers
-	Json({ message, target }: JsonProps)
-	{
+	Json({ message, target }: JsonProps) {
 		const json = JSON.parse(message);
 		const properties = Object.getOwnPropertyNames(json);
 		Object.getOwnPropertyNames(target).forEach((property) => {
-			if (_.includes(properties, property) === false)
-				throw new Error('Invalid JSON');
+			if (_.includes(properties, property) === false) throw new Error('Invalid JSON');
 		});
 		return json;
 	}
 
 	// ? Protocole Message Builders
-	ConnectMessage(username: string): string
-	{
+	ConnectMessage(username: string): string {
 		return JSON.stringify(new Message({ event: 'connect', object: new Connect(username) }));
 	}
-	InviteMessage(from: string, to: string): string
-	{
+	InviteMessage(from: string, to: string): string {
 		return JSON.stringify(new Message({ event: 'invite', object: new Invite(from, to) }));
 	}
-	PlayMessage(username: string, opponent: string): string
-	{
+	PlayMessage(username: string, opponent: string): string {
 		return JSON.stringify(new Message({ event: 'play', object: new Play(username, opponent) }));
 	}
-	HookMessage(up: boolean, down: boolean): string
-	{
+	HookMessage(up: boolean, down: boolean): string {
 		return JSON.stringify(new Message({ event: 'hook', object: new Hook(up, down) }));
 	}
-	ErrorMessage(error: string)
-	{
+	ErrorMessage(error: string) {
 		return JSON.stringify(new Message({ event: 'error', object: new WSError(error) }));
 	}
 }
