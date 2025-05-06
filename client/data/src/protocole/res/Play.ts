@@ -7,6 +7,7 @@ class Play
 		this.username = username;
 		this.opponent = opponent;
 	}
+	public static instance = new Play('', '');
 }
 
 export default Play;

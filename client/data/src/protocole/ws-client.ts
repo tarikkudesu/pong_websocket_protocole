@@ -1,8 +1,20 @@
 import Message from './Message.js';
+import WSError from './WSError.js';
+
+import Pooler from './req/Pooler.js';
+import Frame from './req/Frame.js';
+import Start from './req/Start.js';
+import Score from './req/Score.js';
+import Stop from './req/Stop.js';
+import Lost from './req/Lost.js';
+import Pool from './req/Pool.js';
+import Won from './req/Won.js';
+
 import Connect from './res/Connect.js';
 import Invite from './res/Invite.js';
 import Hook from './res/Hook.js';
 import Play from './res/Play.js';
+
 import _ from 'lodash';
 
 interface JsonProps
@@ -19,7 +31,27 @@ class WS
 		if (WS.instance) return WS.instance;
 		WS.instance = this;
 	}
+	
+	// * connect, invite, play, hook
 
+	// ? Protocole Classes
+	Message = Message;
+	WSError = WSError;
+
+	Pooler = Pooler;
+	Frame = Frame;
+	Start = Start;
+	Score = Score;
+	Stop = Stop;
+	Pool = Pool;
+	Lost = Lost;
+	Won = Won;
+
+	Connect = Connect;
+	Invite = Invite;
+	Play = Play;
+	Hook = Hook;
+	
 	// ? Comminication Helpers
 	Json({ message, target }: JsonProps)
 	{
@@ -31,34 +63,28 @@ class WS
 		});
 		return json;
 	}
-	
-
-	// * connect, invite, play, hook
 
 	// ? Protocole Message Builders
-	ConnectMessage(connect: Connect): string
+	ConnectMessage(username: string): string
 	{
-		return JSON.stringify(new Message({ event: 'connect', object: connect }));
+		return JSON.stringify(new Message({ event: 'connect', object: new Connect(username) }));
 	}
-	InviteMessage(invite: Invite): string
+	InviteMessage(from: string, to: string): string
 	{
-		return JSON.stringify(new Message({ event: 'invite', object: invite }));
+		return JSON.stringify(new Message({ event: 'invite', object: new Invite(from, to) }));
 	}
-	PlayMessage(play: Play): string
+	PlayMessage(username: string, opponent: string): string
 	{
-		return JSON.stringify(new Message({ event: 'play', object: play }));
+		return JSON.stringify(new Message({ event: 'play', object: new Play(username, opponent) }));
 	}
-	HookMessage(hook: Hook): string
+	HookMessage(up: boolean, down: boolean): string
 	{
-		return JSON.stringify(new Message({ event: 'hook', object: hook }));
+		return JSON.stringify(new Message({ event: 'hook', object: new Hook(up, down) }));
 	}
-
-	// ? Protocole Classes
-	public Message = Message;
-	public Connect = Connect;
-	public Invite = Invite;
-	public Play = Play;
-	public Hook = Hook;
+	ErrorMessage(error: string)
+	{
+		return JSON.stringify(new Message({ event: 'error', object: new WSError(error) }));
+	}
 }
 
 export default new WS();

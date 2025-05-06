@@ -1,3 +1,4 @@
+
 class Invite
 {
 	from: string;
@@ -7,6 +8,7 @@ class Invite
 		this.from = from;
 		this.to = to;
 	}
+	public static instance = new Invite('', '');
 }
 
 export default Invite;

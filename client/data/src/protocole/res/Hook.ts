@@ -8,6 +8,7 @@ class Hook
 		this.up = up;
 		this.down = down;
 	}
+	public static instance = new Hook(false, false);
 }
 
 export default Hook;

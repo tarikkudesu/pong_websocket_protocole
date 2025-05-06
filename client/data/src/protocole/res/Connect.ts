@@ -6,6 +6,7 @@ class Connect
 	{
 		this.username = username;
 	}
+	public static instance = new Connect('');
 }
 
 export default Connect;
