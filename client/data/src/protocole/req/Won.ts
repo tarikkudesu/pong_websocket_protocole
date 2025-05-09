@@ -9,4 +9,3 @@ class Won
 	static instance = new Won();
 }
 
-export default Won;

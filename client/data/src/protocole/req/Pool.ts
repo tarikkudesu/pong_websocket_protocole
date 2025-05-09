@@ -21,4 +21,3 @@ class Pool
 	static instance = new Pool([]);
 }
 
-export default Pool;

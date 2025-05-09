@@ -17,4 +17,3 @@ class Frame
 	public static instance = new Frame();
 }
 
-export default Frame;

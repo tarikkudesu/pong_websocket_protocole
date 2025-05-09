@@ -9,4 +9,3 @@ class Start
 	public static instance = new Start();
 }
 
-export default Start;

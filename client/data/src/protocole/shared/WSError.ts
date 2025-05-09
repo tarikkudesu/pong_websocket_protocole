@@ -9,4 +9,3 @@ class WSError
 	static instance = new WSError('');
 }
 
-export default WSError;

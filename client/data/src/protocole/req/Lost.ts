@@ -9,4 +9,3 @@ class Lost
 	static instance = new Lost();
 }
 
-export default Lost;

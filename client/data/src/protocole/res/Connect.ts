@@ -8,5 +8,3 @@ class Connect
 	}
 	public static instance = new Connect('');
 }
-
-export default Connect;

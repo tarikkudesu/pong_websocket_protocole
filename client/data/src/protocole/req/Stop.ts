@@ -9,4 +9,3 @@ class Stop
 	public static instance = new Stop();
 }
 
-export default Stop;

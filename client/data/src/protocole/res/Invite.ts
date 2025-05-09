@@ -11,4 +11,3 @@ class Invite
 	public static instance = new Invite('', '');
 }
 
-export default Invite;

@@ -11,4 +11,3 @@ class Hook
 	public static instance = new Hook(false, false);
 }
 
-export default Hook;

@@ -11,4 +11,3 @@ class Score
 	static instance = new Score(0, 0);
 }
 
-export default Score;

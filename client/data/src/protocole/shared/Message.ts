@@ -17,4 +17,3 @@ class Message
 	public static instance = new Message({event: '', object: {}});
 }
 
-export default Message;

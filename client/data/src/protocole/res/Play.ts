@@ -10,4 +10,3 @@ class Play
 	public static instance = new Play('', '');
 }
 
-export default Play;

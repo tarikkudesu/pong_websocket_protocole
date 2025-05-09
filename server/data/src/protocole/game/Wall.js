@@ -1,4 +1,4 @@
-class Wall
+export class Wall
 {
 	dir;
 	end;
@@ -14,5 +14,3 @@ class Wall
 		this.length = this.end.subtr(this.start).mag(); // ! Length Might not be needed
 	}
 }
-
-export default Wall;

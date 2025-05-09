@@ -1,4 +1,3 @@
-import User from "../shared/User";
 
 class Invitations
 {
@@ -10,4 +9,3 @@ class Invitations
 	static instance = new Invitations([]);
 }
 
-export default Invitations;

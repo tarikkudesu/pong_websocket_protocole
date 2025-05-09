@@ -1,22 +1,196 @@
-import Message from './shared/Message.js';
-import WSError from './shared/WSError.js';
-
-import Pooler from './res/Pool.js';
-import Frame from './res/Frame.js';
-import Start from './res/Start.js';
-import Score from './res/Score.js';
-import Stop from './res/Stop.js';
-import Lost from './res/Lost.js';
-import Pool from './res/Pool.js';
-import Won from './res/Won.js';
-
-import Connect from './req/Connect.js';
-import Invite from './req/Invite.js';
-import Hook from './req/Hook.js';
-import Play from './req/Play.js';
+import { Ball, Vector, Paddle } from './game/index.js';
 
 import _ from 'lodash';
-import Invitations from './res/Invitations.js';
+
+
+// ! shared ------------------------------------------------------------------------------------------
+export class Message
+{
+	constructor({ event, object })
+	{
+		this.message = event;
+		this.data = JSON.stringify(object);
+	}
+	static instance = new Message({event: '', object: {}});
+}
+
+export class User
+{
+	constructor(username, email)
+	{
+		this.username = username;
+		this.email = email;
+	}
+	static instance = new User('', '');
+}
+
+
+export class WSError
+{
+	constructor(error)
+	{
+		this.message = error;
+	}
+	static instance = new WSError('');
+}
+
+// ! res ------------------------------------------------------------------------------------------
+
+export class Frame
+{
+	ballX;
+	ballY;
+	ballRadius;
+	paddleRadius;
+	leftPaddleTopX;
+	leftPaddleTopY;
+	rightPaddleTopX;
+	rightPaddleTopY;
+	leftPaddleBottomX;
+	leftPaddleBottomY;
+	rightPaddleBottomX;
+	rightPaddleBottomY;
+	constructor(ball, rightPaddle, leftPaddle)
+	{
+		this.ballRadius = Math.ceil(ball.radius);
+		this.paddleRadius = Math.ceil(rightPaddle.radius);
+		this.ballX = Math.ceil(ball.pos.x);
+		this.ballY = Math.ceil(ball.pos.y);
+		this.rightPaddleTopX = Math.ceil(rightPaddle.start.x);
+		this.rightPaddleTopY = Math.ceil(rightPaddle.start.y);
+		this.rightPaddleBottomX = Math.ceil(rightPaddle.end.x);
+		this.rightPaddleBottomY = Math.ceil(rightPaddle.end.y);
+		this.leftPaddleTopX = Math.ceil(leftPaddle.start.x);
+		this.leftPaddleTopY = Math.ceil(leftPaddle.start.y);
+		this.leftPaddleBottomX = Math.ceil(leftPaddle.end.x);
+		this.leftPaddleBottomY = Math.ceil(leftPaddle.end.y);
+	}
+	static instance = new Frame(
+		new Ball({ pos: new Vector(0, 0), radius: 0, velocity: new Vector(0, 0) }),
+		new Paddle({ start: new Vector(0, 0), end: new Vector(0, 0), radius: 0, constrains: new Vector(0, 0) }),
+		new Paddle({ start: new Vector(0, 0), end: new Vector(0, 0), radius: 0, constrains: new Vector(0, 0) })
+	);
+}
+
+export class Invitations
+{
+	constructor(invitations)
+	{
+		this.invitations = invitations;
+	}
+	static instance = new Invitations([]);
+}
+
+export class Lost
+{
+	constructor()
+	{
+		this.lost = 'lost';
+	}
+	static instance = new Lost();
+}
+
+export class Pooler
+{
+	constructor(username, profile)
+	{
+		this.username = username;
+		this.profile = profile;
+	}
+	static instance = new Pooler('', '');
+}
+
+export class Pool
+{
+	constructor(pool)
+	{
+		this.pool = pool;
+	}
+	static instance = new Pool([]);
+}
+
+export class Score
+{
+	constructor(player, opponent)
+	{
+		this.player = player;
+		this.opponent = opponent;
+	}
+	static instance = new Score(0, 0);
+}
+
+export class Start
+{
+	constructor()
+	{
+		this.start = 'start';
+	}
+	static instance = new Start();
+}
+
+export class Stop
+{
+	constructor()
+	{
+		this.stop = 'stop';
+	}
+	static instance = new Stop();
+}
+
+export class Won
+{
+	constructor()
+	{
+		this.won = 'won';
+	}
+	static instance = new Won();
+}
+
+// ! req -------------------------------------------------------------------------
+
+export class Connect
+{
+	// TODO: initial game data can be added here
+	constructor(username)
+	{
+		this.username = username;
+	}
+	static instance = new Connect('');
+}
+
+
+export class Hook
+{
+	constructor(up, down)
+	{
+		this.up = up;
+		this.down = down;
+	}
+	static instance = new Hook(false, false);
+}
+
+
+export class Invite
+{
+	constructor(from, to)
+	{
+		this.from = from;
+		this.to = to;
+	}
+	static instance = new Invite('', '');
+}
+
+export class Play
+{
+	constructor(username, opponent)
+	{
+		this.username = username;
+		this.opponent = opponent;
+	}
+	static instance = new Play('', '');
+}
+
+// ! Protocole ------------------------------------------------------------------------------
 
 class WS {
 	static #insance;
@@ -27,26 +201,7 @@ class WS {
 		WS.#insance = this;
 	}
 
-	// * frame, start, stop, pool, score, won, lost
-
-	// ? Protocole Classes
-	Message = Message;
-	WSError = WSError;
-
-	Invitation = Invitations;
-	Pooler = Pooler;
-	Frame = Frame;
-	Start = Start;
-	Score = Score;
-	Stop = Stop;
-	Pool = Pool;
-	Lost = Lost;
-	Won = Won;
-
-	Connect = Connect;
-	Invite = Invite;
-	Hook = Hook;
-	Play = Play;
+	// * frame, start, stop, pool, score, won, lost, invitations, error
 
 
 	// ? Comminication Helpers

@@ -1,4 +1,4 @@
-class Vector
+export class Vector
 {
 	x;
 	y;
@@ -42,5 +42,3 @@ class Vector
 		return v1.x * v2.y - v1.y * v2.x;
 	}
 }
-
-export default Vector;

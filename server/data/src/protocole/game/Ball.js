@@ -1,20 +1,15 @@
-import Vector from './Vector.js';
+import { Vector } from './Vector.js';
 
-class Ball
-{
+export class Ball {
 	pos;
 	radius;
 	velocity = new Vector(0, 0);
-	constructor({ pos, radius, velocity })
-	{
+	constructor({ pos, radius, velocity }) {
 		this.pos = pos;
 		this.radius = radius;
 		this.velocity = velocity;
 	}
-	reposition()
-	{
+	reposition() {
 		this.pos = this.pos.add(this.velocity.mult(10));
 	}
 }
-
-export default Ball;

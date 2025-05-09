@@ -10,4 +10,3 @@ class User
 	static instance = new User('', '');
 }
 
-export default User;
