@@ -2,33 +2,25 @@ import { Ball, Vector, Paddle } from './game/index.js';
 
 import _ from 'lodash';
 
-
 // ! shared ------------------------------------------------------------------------------------------
-export class Message
-{
-	constructor({ event, object })
-	{
+export class Message {
+	constructor({ event, object }) {
 		this.message = event;
 		this.data = JSON.stringify(object);
 	}
-	static instance = new Message({event: '', object: {}});
+	static instance = new Message({ event: '', object: {} });
 }
 
-export class User
-{
-	constructor(username, email)
-	{
+export class User {
+	constructor(username, email) {
 		this.username = username;
 		this.email = email;
 	}
 	static instance = new User('', '');
 }
 
-
-export class WSError
-{
-	constructor(error)
-	{
+export class WSError {
+	constructor(error) {
 		this.message = error;
 	}
 	static instance = new WSError('');
@@ -36,8 +28,7 @@ export class WSError
 
 // ! res ------------------------------------------------------------------------------------------
 
-export class Frame
-{
+export class Frame {
 	ballX;
 	ballY;
 	ballRadius;
@@ -50,8 +41,7 @@ export class Frame
 	leftPaddleBottomY;
 	rightPaddleBottomX;
 	rightPaddleBottomY;
-	constructor(ball, rightPaddle, leftPaddle)
-	{
+	constructor(ball, rightPaddle, leftPaddle) {
 		this.ballRadius = Math.ceil(ball.radius);
 		this.paddleRadius = Math.ceil(rightPaddle.radius);
 		this.ballX = Math.ceil(ball.pos.x);
@@ -72,75 +62,59 @@ export class Frame
 	);
 }
 
-export class Invitations
-{
-	constructor(invitations)
-	{
+export class Invitations {
+	constructor(invitations) {
 		this.invitations = invitations;
 	}
 	static instance = new Invitations([]);
 }
 
-export class Lost
-{
-	constructor()
-	{
+export class Lost {
+	constructor() {
 		this.lost = 'lost';
 	}
 	static instance = new Lost();
 }
 
-export class Pooler
-{
-	constructor(username, profile)
-	{
+export class Pooler {
+	constructor(username, profile) {
 		this.username = username;
 		this.profile = profile;
 	}
 	static instance = new Pooler('', '');
 }
 
-export class Pool
-{
-	constructor(pool)
-	{
+export class Pool {
+	constructor(pool) {
 		this.pool = pool;
 	}
 	static instance = new Pool([]);
 }
 
-export class Score
-{
-	constructor(player, opponent)
-	{
+export class Score {
+	constructor(player, opponent) {
 		this.player = player;
 		this.opponent = opponent;
 	}
 	static instance = new Score(0, 0);
 }
 
-export class Start
-{
-	constructor()
-	{
+export class Start {
+	constructor() {
 		this.start = 'start';
 	}
 	static instance = new Start();
 }
 
-export class Stop
-{
-	constructor()
-	{
+export class Stop {
+	constructor() {
 		this.stop = 'stop';
 	}
 	static instance = new Stop();
 }
 
-export class Won
-{
-	constructor()
-	{
+export class Won {
+	constructor() {
 		this.won = 'won';
 	}
 	static instance = new Won();
@@ -148,42 +122,32 @@ export class Won
 
 // ! req -------------------------------------------------------------------------
 
-export class Connect
-{
+export class Connect {
 	// TODO: initial game data can be added here
-	constructor(username)
-	{
+	constructor(username) {
 		this.username = username;
 	}
 	static instance = new Connect('');
 }
 
-
-export class Hook
-{
-	constructor(up, down)
-	{
+export class Hook {
+	constructor(up, down) {
 		this.up = up;
 		this.down = down;
 	}
 	static instance = new Hook(false, false);
 }
 
-
-export class Invite
-{
-	constructor(from, to)
-	{
+export class Invite {
+	constructor(from, to) {
 		this.from = from;
 		this.to = to;
 	}
 	static instance = new Invite('', '');
 }
 
-export class Play
-{
-	constructor(username, opponent)
-	{
+export class Play {
+	constructor(username, opponent) {
 		this.username = username;
 		this.opponent = opponent;
 	}
@@ -192,68 +156,55 @@ export class Play
 
 // ! Protocole ------------------------------------------------------------------------------
 
-class WS {
+class WSS {
 	static #insance;
 
-	constructor()
-	{
-		if (WS.#insance) return WS.#insance;
-		WS.#insance = this;
+	constructor() {
+		if (WSS.#insance) return WSS.#insance;
+		WSS.#insance = this;
 	}
 
 	// * frame, start, stop, pool, score, won, lost, invitations, error
 
-
 	// ? Comminication Helpers
-	Json({ message, target })
-	{
+	Json({ message, target }) {
 		const json = JSON.parse(message);
 		const properties = Object.getOwnPropertyNames(json);
 		const targetProperties = Object.getOwnPropertyNames(target);
 		targetProperties.forEach((property) => {
-			if (_.includes(properties, property) === false)
-				throw new Error('Invalid JSON');
+			if (_.includes(properties, property) === false) throw new Error('Invalid JSON');
 		});
 		return json;
 	}
 
 	// ? Protocole Message Builders
-	FrameMessage(ball, rightPaddle, leftPaddle)
-	{
+	FrameMessage(ball, rightPaddle, leftPaddle) {
 		return JSON.stringify(new Message({ event: 'frame', object: new Frame(ball, rightPaddle, leftPaddle) }));
 	}
-	StartMessage()
-	{
+	StartMessage() {
 		return JSON.stringify(new Message({ event: 'start', object: new Start() }));
 	}
-	StopMessage()
-	{
+	StopMessage() {
 		return JSON.stringify(new Message({ event: 'stop', object: new Stop() }));
 	}
-	PoolMessage(getPoolers)
-	{
+	PoolMessage(getPoolers) {
 		return JSON.stringify(new Message({ event: 'pool', object: new Pool(getPoolers()) }));
 	}
-	InvitationMessage(getInvitions)
-	{
+	InvitationMessage(getInvitions) {
 		return JSON.stringify(new Message({ event: 'invitations', object: new Invitations(getInvitions()) }));
 	}
-	WonMessage()
-	{
+	WonMessage() {
 		return JSON.stringify(new Message({ event: 'won', object: new Won() }));
 	}
-	LostMessage()
-	{
+	LostMessage() {
 		return JSON.stringify(new Message({ event: 'lost', object: new Lost() }));
 	}
-	ScoreMessage(player, opponent)
-	{
+	ScoreMessage(player, opponent) {
 		return JSON.stringify(new Message({ event: 'score', object: new Score(player, opponent) }));
 	}
-	ErrorMessage(error)
-	{
+	ErrorMessage(error) {
 		return JSON.stringify(new Message({ event: 'error', object: new WSError(error) }));
 	}
 }
 
-export default new WS();
+export const WS = new WSS();

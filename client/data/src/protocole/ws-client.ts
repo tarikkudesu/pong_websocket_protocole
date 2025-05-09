@@ -1,42 +1,34 @@
-
 import _ from 'lodash';
 
 // ! shared -----------------------------------------------------------------------------
 
-interface MessageProps
-{
+interface MessageProps {
 	event: string;
 	object: Object;
 }
 
-export class Message
-{
+export class Message {
 	public message: string;
 	public data: string;
-	constructor({ event, object }: MessageProps)
-	{
+	constructor({ event, object }: MessageProps) {
 		this.message = event;
 		this.data = JSON.stringify(object);
 	}
-	public static instance = new Message({event: '', object: {}});
+	public static instance = new Message({ event: '', object: {} });
 }
 
-export class WSError
-{
+export class WSError {
 	public message: string;
-	constructor(error: string)
-	{
+	constructor(error: string) {
 		this.message = error;
 	}
 	static instance = new WSError('');
 }
 
-export class User
-{
+export class User {
 	public username: string;
 	public email: string;
-	constructor(username: string, email: string)
-	{
+	constructor(username: string, email: string) {
 		this.username = username;
 		this.email = email;
 	}
@@ -45,47 +37,39 @@ export class User
 
 // ! res --------------------------------------------------------------------------------
 
-export class Connect
-{
+export class Connect {
 	// TODO: initial game data can be added here
 	username: string;
-	constructor(username: string)
-	{
+	constructor(username: string) {
 		this.username = username;
 	}
 	public static instance = new Connect('');
 }
 
-export class Hook
-{
+export class Hook {
 	up: boolean;
 	down: boolean;
-	constructor(up: boolean, down: boolean)
-	{
+	constructor(up: boolean, down: boolean) {
 		this.up = up;
 		this.down = down;
 	}
 	public static instance = new Hook(false, false);
 }
 
-export class Invite
-{
+export class Invite {
 	from: string;
 	to: string;
-	constructor(from: string, to: string)
-	{
+	constructor(from: string, to: string) {
 		this.from = from;
 		this.to = to;
 	}
 	public static instance = new Invite('', '');
 }
 
-export class Play
-{
+export class Play {
 	username: string;
 	opponent: string;
-	constructor(username: string, opponent: string)
-	{
+	constructor(username: string, opponent: string) {
 		this.username = username;
 		this.opponent = opponent;
 	}
@@ -94,8 +78,7 @@ export class Play
 
 // ! req --------------------------------------------------------------------------------
 
-export class Frame
-{
+export class Frame {
 	ballX: number = 0;
 	ballY: number = 0;
 	ballRadius: number = 0;
@@ -112,91 +95,73 @@ export class Frame
 	public static instance = new Frame();
 }
 
-export class Invitations
-{
+export class Invitations {
 	public invitations: User[];
-	constructor(invitations: User[])
-	{
+	constructor(invitations: User[]) {
 		this.invitations = invitations;
 	}
 	static instance = new Invitations([]);
 }
 
-export class Lost
-{
+export class Lost {
 	public lost: string;
-	constructor()
-	{
+	constructor() {
 		this.lost = 'lost';
 	}
 	static instance = new Lost();
 }
 
-export class Pooler
-{
+export class Pooler {
 	public username: string;
 	public profile: string;
-	constructor(username: string, profile: string)
-	{
+	constructor(username: string, profile: string) {
 		this.username = username;
 		this.profile = profile;
 	}
 	static instance = new Pooler('', '');
 }
 
-export class Pool
-{
+export class Pool {
 	public pool: Pooler[];
-	constructor(pool: Pooler[])
-	{
+	constructor(pool: Pooler[]) {
 		this.pool = pool;
 	}
 	static instance = new Pool([]);
 }
 
-export class Score
-{
+export class Score {
 	public player: number;
 	public opponent: number;
-	constructor(player: number, opponent: number)
-	{
+	constructor(player: number, opponent: number) {
 		this.player = player;
 		this.opponent = opponent;
 	}
 	static instance = new Score(0, 0);
 }
 
-export class Start
-{
+export class Start {
 	public start: string;
-	constructor()
-	{
+	constructor() {
 		this.start = 'start';
 	}
 	public static instance = new Start();
 }
 
-export class Stop
-{
+export class Stop {
 	public stop: string;
-	constructor()
-	{
+	constructor() {
 		this.stop = 'stop';
 	}
 	public static instance = new Stop();
 }
 
-
-export class Won
-{
+export class Won {
 	public won: string;
-	constructor()
-	{
+	constructor() {
 		this.won = 'won';
 	}
 	static instance = new Won();
 }
-
 
 // ! Protocole ------------------------------------------------------------
 
@@ -205,11 +170,11 @@ interface JsonProps {
 	target: Object;
 }
 
-class WS {
-	private static instance: WS | null;
+class WSC {
+	private static instance: WSC | null;
 	constructor() {
-		if (WS.instance) return WS.instance;
-		WS.instance = this;
+		if (WSC.instance) return WSC.instance;
+		WSC.instance = this;
 	}
 
 	// * connect, invite, play, hook
@@ -242,4 +207,4 @@ class WS {
 	}
 }
 
-export default new WS();
+export const WS = new WSC();
