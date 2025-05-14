@@ -1,10 +1,44 @@
-import WS from './protocole/ws-server.js';
 import { Ball, Paddle, Vector } from './protocole/game/index.js';
-import { Message, Frame, Start, Stop, Pool, Won, Lost, Score, WSError } from './protocole/ws-server.js';
+import { WS, Message, Frame, Start, Stop, Pool, Won, Lost, Score, WSError, Invitations, Hash } from './protocole/ws-server.js';
 
 let message;
 let messageJson;
 let messageData;
+
+message = WS.HashMessage('rick', 'img', 'asjhgkajhsfkjhsf');
+messageJson = WS.Json({ message: message, target: Message.instance });
+console.log(messageJson);
+messageData = WS.Json({ message: messageJson.data, target: Hash.instance });
+console.log(messageData);
+console.log('---------------------------------------------------');
+
+// ! Pool -----------------------------------------------------------
+message = WS.InvitationMessage(function () {
+	return [
+		{ sender: 'salam', recipient: '3alam' },
+		{ sender: 'kalam', recipient: 'salam' },
+		{ sender: '3alam', recipient: 'kalam' },
+	];
+});
+messageJson = WS.Json({ message: message, target: Message.instance });
+console.log(messageJson);
+messageData = WS.Json({ message: messageJson.data, target: Invitations.instance });
+console.log(messageData);
+console.log('---------------------------------------------------');
+
+// ! Pool -----------------------------------------------------------
+message = WS.PoolMessage(function () {
+	return [
+		{ username: 'salam', profile: 'salam' },
+		{ username: 'kalam', profile: 'kalam' },
+		{ username: '3alam', profile: '3alam' },
+	];
+});
+messageJson = WS.Json({ message: message, target: Message.instance });
+console.log(messageJson);
+messageData = WS.Json({ message: messageJson.data, target: Pool.instance });
+console.log(messageData);
+console.log('---------------------------------------------------');
 
 // ! Frame -----------------------------------------------------------
 message = WS.FrameMessage(
@@ -31,20 +65,6 @@ message = WS.StopMessage();
 messageJson = WS.Json({ message: message, target: Message.instance });
 console.log(messageJson);
 messageData = WS.Json({ message: messageJson.data, target: Stop.instance });
-console.log(messageData);
-console.log('---------------------------------------------------');
-
-// ! Pool -----------------------------------------------------------
-message = WS.PoolMessage(function () {
-	return [
-		{ username: 'salam', profile: 'salam' },
-		{ username: 'kalam', profile: 'kalam' },
-		{ username: '3alam', profile: '3alam' },
-	];
-});
-messageJson = WS.Json({ message: message, target: Message.instance });
-console.log(messageJson);
-messageData = WS.Json({ message: messageJson.data, target: Pool.instance });
 console.log(messageData);
 console.log('---------------------------------------------------');
 

@@ -28,6 +28,54 @@ export class WSError {
 
 // ! res ------------------------------------------------------------------------------------------
 
+// * Pool
+export class Hash {
+	constructor(username, img, hash) {
+		this.username = username;
+		this.hash = hash;
+		this.img = img;
+	}
+	static instance = new Hash('', '', '');
+}
+
+export class Pooler {
+	constructor(username, img) {
+		this.username = username;
+		this.img = img;
+	}
+	static instance = new Pooler('', '');
+}
+
+export class Pool {
+	constructor(pool) {
+		this.pool = pool;
+	}
+	static instance = new Pool([]);
+}
+
+export class Invitations {
+	constructor(invitations) {
+		this.invitations = invitations;
+	}
+	static instance = new Invitations([]);
+}
+
+// * Game
+
+export class Start {
+	constructor() {
+		this.start = 'START';
+	}
+	static instance = new Start();
+}
+
+export class Stop {
+	constructor() {
+		this.stop = 'STOP';
+	}
+	static instance = new Stop();
+}
+
 export class Frame {
 	ballX;
 	ballY;
@@ -62,35 +110,6 @@ export class Frame {
 	);
 }
 
-export class Invitations {
-	constructor(invitations) {
-		this.invitations = invitations;
-	}
-	static instance = new Invitations([]);
-}
-
-export class Lost {
-	constructor() {
-		this.lost = 'lost';
-	}
-	static instance = new Lost();
-}
-
-export class Pooler {
-	constructor(username, profile) {
-		this.username = username;
-		this.profile = profile;
-	}
-	static instance = new Pooler('', '');
-}
-
-export class Pool {
-	constructor(pool) {
-		this.pool = pool;
-	}
-	static instance = new Pool([]);
-}
-
 export class Score {
 	constructor(player, opponent) {
 		this.player = player;
@@ -99,59 +118,71 @@ export class Score {
 	static instance = new Score(0, 0);
 }
 
-export class Start {
+export class Lost {
 	constructor() {
-		this.start = 'start';
+		this.lost = 'LOST';
 	}
-	static instance = new Start();
-}
-
-export class Stop {
-	constructor() {
-		this.stop = 'stop';
-	}
-	static instance = new Stop();
+	static instance = new Lost();
 }
 
 export class Won {
 	constructor() {
-		this.won = 'won';
+		this.won = 'WON';
 	}
 	static instance = new Won();
 }
 
 // ! req -------------------------------------------------------------------------
 
+// * Pool
 export class Connect {
 	// TODO: initial game data can be added here
-	constructor(username) {
+	constructor(username, img) {
 		this.username = username;
+		this.img - img;
 	}
 	static instance = new Connect('');
 }
 
+export class Invite {
+	constructor(sender, recipient) {
+		this.sender = sender;
+		this.recipient = recipient;
+	}
+	static instance = new Invite('', '');
+}
+
+export class Accept {
+	constructor(sender, recipient) {
+		this.sender = sender;
+		this.recipient = recipient;
+	}
+	static instance = new Accept('', '');
+}
+
+export class Reject {
+	constructor(sender, recipient) {
+		this.sender = sender;
+		this.recipient = recipient;
+	}
+	static instance = new Reject('', '');
+}
+
+export class Delete {
+	constructor(sender, recipient) {
+		this.sender = sender;
+		this.recipient = recipient;
+	}
+	static instance = new Reject('', '');
+}
+
+// * Pool
 export class Hook {
 	constructor(up, down) {
 		this.up = up;
 		this.down = down;
 	}
 	static instance = new Hook(false, false);
-}
-
-export class Invite {
-	constructor(from, to) {
-		this.from = from;
-		this.to = to;
-	}
-	static instance = new Invite('', '');
-}
-
-export class Play {
-	constructor(username, opponent) {
-		this.username = username;
-		this.opponent = opponent;
-	}
-	static instance = new Play('', '');
 }
 
 // ! Protocole ------------------------------------------------------------------------------
@@ -178,32 +209,38 @@ class WSS {
 	}
 
 	// ? Protocole Message Builders
-	FrameMessage(ball, rightPaddle, leftPaddle) {
-		return JSON.stringify(new Message({ event: 'frame', object: new Frame(ball, rightPaddle, leftPaddle) }));
+
+	ErrorMessage(error) {
+		return JSON.stringify(new Message({ event: 'ERROR', object: new WSError(error) }));
 	}
-	StartMessage() {
-		return JSON.stringify(new Message({ event: 'start', object: new Start() }));
-	}
-	StopMessage() {
-		return JSON.stringify(new Message({ event: 'stop', object: new Stop() }));
+	// * POOL
+	HashMessage(username, img, hash) {
+		return JSON.stringify(new Message({ event: 'Hash', object: new Hash(username, img, hash) }));
 	}
 	PoolMessage(getPoolers) {
-		return JSON.stringify(new Message({ event: 'pool', object: new Pool(getPoolers()) }));
+		return JSON.stringify(new Message({ event: 'POOL', object: new Pool(getPoolers()) }));
 	}
 	InvitationMessage(getInvitions) {
-		return JSON.stringify(new Message({ event: 'invitations', object: new Invitations(getInvitions()) }));
+		return JSON.stringify(new Message({ event: 'INVITATIONS', object: new Invitations(getInvitions()) }));
 	}
-	WonMessage() {
-		return JSON.stringify(new Message({ event: 'won', object: new Won() }));
+	// * GAME
+	StartMessage() {
+		return JSON.stringify(new Message({ event: 'START', object: new Start() }));
 	}
-	LostMessage() {
-		return JSON.stringify(new Message({ event: 'lost', object: new Lost() }));
+	StopMessage() {
+		return JSON.stringify(new Message({ event: 'STOP', object: new Stop() }));
+	}
+	FrameMessage(ball, rightPaddle, leftPaddle) {
+		return JSON.stringify(new Message({ event: 'FRAME', object: new Frame(ball, rightPaddle, leftPaddle) }));
 	}
 	ScoreMessage(player, opponent) {
-		return JSON.stringify(new Message({ event: 'score', object: new Score(player, opponent) }));
+		return JSON.stringify(new Message({ event: 'SCORE', object: new Score(player, opponent) }));
 	}
-	ErrorMessage(error) {
-		return JSON.stringify(new Message({ event: 'error', object: new WSError(error) }));
+	LostMessage() {
+		return JSON.stringify(new Message({ event: 'LOST', object: new Lost() }));
+	}
+	WonMessage() {
+		return JSON.stringify(new Message({ event: 'WON', object: new Won() }));
 	}
 }
 
