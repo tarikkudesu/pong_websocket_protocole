@@ -4,7 +4,8 @@ import _ from 'lodash';
 
 interface MessageProps {
 	event: string;
-	object: Object;
+	// eslint-disable-next-line @typescript-eslint/no-explicit-any
+	object: any;
 }
 
 export class Message {
@@ -17,6 +18,14 @@ export class Message {
 	public static instance = new Message({ event: '', object: {} });
 }
 
+export class Invitation {
+	public username: string = '';
+	public img: string = '';
+	public invite_status: string = '';
+	constructor() {}
+	static instance = new Invitation();
+}
+
 export class WSError {
 	public message: string;
 	constructor(error: string) {
@@ -25,27 +34,65 @@ export class WSError {
 	static instance = new WSError('');
 }
 
-export class User {
-	public username: string;
-	public email: string;
-	constructor(username: string, email: string) {
-		this.username = username;
-		this.email = email;
-	}
-	static instance = new User('', '');
-}
-
 // ! res --------------------------------------------------------------------------------
 
+// * Pool
 export class Connect {
 	// TODO: initial game data can be added here
 	username: string;
-	constructor(username: string) {
+	img: string;
+	page: string;
+	query: string;
+	constructor(username: string, img: string, page: string, query: string) {
 		this.username = username;
+		this.query = query;
+		this.page = page;
+		this.img = img;
 	}
-	public static instance = new Connect('');
+	public static instance = new Connect('', '', '', '');
 }
 
+export class Invite {
+	sender: string;
+	recipient: string;
+	constructor(sender: string, recipient: string) {
+		this.sender = sender;
+		this.recipient = recipient;
+	}
+	public static instance = new Invite('', '');
+}
+
+export class Accept {
+	sender: string;
+	recipient: string;
+	constructor(sender: string, recipient: string) {
+		this.sender = sender;
+		this.recipient = recipient;
+	}
+	public static instance = new Accept('', '');
+}
+
+export class Reject {
+	sender: string;
+	recipient: string;
+	constructor(sender: string, recipient: string) {
+		this.sender = sender;
+		this.recipient = recipient;
+	}
+	public static instance = new Reject('', '');
+}
+
+export class Delete {
+	sender: string;
+	recipient: string;
+	constructor(sender: string, recipient: string) {
+		this.sender = sender;
+		this.recipient = recipient;
+	}
+	public static instance = new Delete('', '');
+}
+
+// * Game
 export class Hook {
 	up: boolean;
 	down: boolean;
@@ -56,59 +103,15 @@ export class Hook {
 	public static instance = new Hook(false, false);
 }
 
-export class Invite {
-	from: string;
-	to: string;
-	constructor(from: string, to: string) {
-		this.from = from;
-		this.to = to;
-	}
-	public static instance = new Invite('', '');
-}
-
-export class Play {
-	username: string;
-	opponent: string;
-	constructor(username: string, opponent: string) {
-		this.username = username;
-		this.opponent = opponent;
-	}
-	public static instance = new Play('', '');
-}
-
 // ! req --------------------------------------------------------------------------------
 
-export class Frame {
-	ballX: number = 0;
-	ballY: number = 0;
-	ballRadius: number = 0;
-	paddleRadius: number = 0;
-	leftPaddleTopX: number = 0;
-	leftPaddleTopY: number = 0;
-	rightPaddleTopX: number = 0;
-	rightPaddleTopY: number = 0;
-	leftPaddleBottomX: number = 0;
-	leftPaddleBottomY: number = 0;
-	rightPaddleBottomX: number = 0;
-	rightPaddleBottomY: number = 0;
+// * Pool
+export class Hash {
+	username: string = '';
+	hash: string = '';
+	img: string = '';
 	constructor() {}
-	public static instance = new Frame();
-}
-
-export class Invitations {
-	public invitations: User[];
-	constructor(invitations: User[]) {
-		this.invitations = invitations;
-	}
-	static instance = new Invitations([]);
-}
-
-export class Lost {
-	public lost: string;
-	constructor() {
-		this.lost = 'lost';
-	}
-	static instance = new Lost();
+	static instance = new Hash();
 }
 
 export class Pooler {
@@ -127,6 +130,39 @@ export class Pool {
 		this.pool = pool;
 	}
 	static instance = new Pool([]);
+}
+
+export class Invitations {
+	public invitations: User[];
+	constructor(invitations: User[]) {
+		this.invitations = invitations;
+	}
+	static instance = new Invitations([]);
+}
+
+export class Frame {
+	ballX: number = 0;
+	ballY: number = 0;
+	ballRadius: number = 0;
+	paddleRadius: number = 0;
+	leftPaddleTopX: number = 0;
+	leftPaddleTopY: number = 0;
+	rightPaddleTopX: number = 0;
+	rightPaddleTopY: number = 0;
+	leftPaddleBottomX: number = 0;
+	leftPaddleBottomY: number = 0;
+	rightPaddleBottomX: number = 0;
+	rightPaddleBottomY: number = 0;
+	constructor() {}
+	public static instance = new Frame();
+}
+
+export class Lost {
+	public lost: string;
+	constructor() {
+		this.lost = 'lost';
+	}
+	static instance = new Lost();
 }
 
 export class Score {
@@ -167,7 +203,8 @@ export class Won {
 
 interface JsonProps {
 	message: string;
-	target: Object;
+	// eslint-disable-next-line @typescript-eslint/no-explicit-any
+	target: any;
 }
 
 class WSC {
@@ -190,20 +227,20 @@ class WSC {
 	}
 
 	// ? Protocole Message Builders
-	ConnectMessage(username: string): string {
-		return JSON.stringify(new Message({ event: 'connect', object: new Connect(username) }));
+	ConnectMessage(username: string, img: string, page: string, query: string): string {
+		return JSON.stringify(new Message({ event: 'CONNECT', object: new Connect(username, img, page, query) }));
 	}
 	InviteMessage(from: string, to: string): string {
-		return JSON.stringify(new Message({ event: 'invite', object: new Invite(from, to) }));
+		return JSON.stringify(new Message({ event: 'INVITE', object: new Invite(from, to) }));
 	}
 	PlayMessage(username: string, opponent: string): string {
-		return JSON.stringify(new Message({ event: 'play', object: new Play(username, opponent) }));
+		return JSON.stringify(new Message({ event: 'PLAY', object: new Play(username, opponent) }));
 	}
 	HookMessage(up: boolean, down: boolean): string {
-		return JSON.stringify(new Message({ event: 'hook', object: new Hook(up, down) }));
+		return JSON.stringify(new Message({ event: 'HOOK', object: new Hook(up, down) }));
 	}
 	ErrorMessage(error: string) {
-		return JSON.stringify(new Message({ event: 'error', object: new WSError(error) }));
+		return JSON.stringify(new Message({ event: 'ERROR', object: new WSError(error) }));
 	}
 }
 

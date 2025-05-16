@@ -11,14 +11,6 @@ export class Message {
 	static instance = new Message({ event: '', object: {} });
 }
 
-export class User {
-	constructor(username, email) {
-		this.username = username;
-		this.email = email;
-	}
-	static instance = new User('', '');
-}
-
 export class WSError {
 	constructor(error) {
 		this.message = error;
@@ -61,7 +53,6 @@ export class Invitations {
 }
 
 // * Game
-
 export class Start {
 	constructor() {
 		this.start = 'START';
@@ -137,9 +128,11 @@ export class Won {
 // * Pool
 export class Connect {
 	// TODO: initial game data can be added here
-	constructor(username, img) {
+	constructor(username, img, page, query) {
 		this.username = username;
-		this.img - img;
+		this.query = query;
+		this.page = page;
+		this.img = img;
 	}
 	static instance = new Connect('');
 }
@@ -176,7 +169,7 @@ export class Delete {
 	static instance = new Reject('', '');
 }
 
-// * Pool
+// * Game
 export class Hook {
 	constructor(up, down) {
 		this.up = up;
