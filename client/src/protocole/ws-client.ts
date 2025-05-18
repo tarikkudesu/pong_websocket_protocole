@@ -20,10 +20,10 @@ export class Message {
 
 export class Pooler {
 	public username: string;
-	public profile: string;
-	constructor(username: string, profile: string) {
+	public img: string;
+	constructor(username: string, img: string) {
 		this.username = username;
-		this.profile = profile;
+		this.img = img;
 	}
 	static instance = new Pooler('', '');
 }
