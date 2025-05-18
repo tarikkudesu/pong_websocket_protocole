@@ -2,7 +2,6 @@ import { Paddle } from './Paddle.js';
 import { Ball } from './Ball.js';
 import { Vector } from './Vector.js';
 import { Wall } from './Wall.js';
-import { BlobOptions } from 'buffer';
 
 const friction: number = 0.05;
 
