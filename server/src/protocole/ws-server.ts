@@ -92,18 +92,18 @@ export class Stop {
 }
 
 export class Frame {
-	ballX;
-	ballY;
-	ballRadius;
-	paddleRadius;
-	leftPaddleTopX;
-	leftPaddleTopY;
-	rightPaddleTopX;
-	rightPaddleTopY;
-	leftPaddleBottomX;
-	leftPaddleBottomY;
-	rightPaddleBottomX;
-	rightPaddleBottomY;
+	public ballX: number;
+	public ballY: number;
+	public ballRadius: number;
+	public paddleRadius: number;
+	public leftPaddleTopX: number;
+	public leftPaddleTopY: number;
+	public rightPaddleTopX: number;
+	public rightPaddleTopY: number;
+	public leftPaddleBottomX: number;
+	public leftPaddleBottomY: number;
+	public rightPaddleBottomX: number;
+	public rightPaddleBottomY: number;
 	constructor(ball: Ball, rightPaddle: Paddle, leftPaddle: Paddle) {
 		this.ballRadius = Math.ceil(ball.radius);
 		this.paddleRadius = Math.ceil(rightPaddle.radius);
