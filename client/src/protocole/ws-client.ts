@@ -18,6 +18,16 @@ export class Message {
 	public static instance = new Message({ event: '', object: {} });
 }
 
+export class Pooler {
+	public username: string;
+	public profile: string;
+	constructor(username: string, profile: string) {
+		this.username = username;
+		this.profile = profile;
+	}
+	static instance = new Pooler('', '');
+}
+
 export class Invitation {
 	public username: string = '';
 	public img: string = '';
@@ -114,16 +124,6 @@ export class Hash {
 	static instance = new Hash();
 }
 
-export class Pooler {
-	public username: string;
-	public profile: string;
-	constructor(username: string, profile: string) {
-		this.username = username;
-		this.profile = profile;
-	}
-	static instance = new Pooler('', '');
-}
-
 export class Pool {
 	public pool: Pooler[];
 	constructor(pool: Pooler[]) {
@@ -133,8 +133,8 @@ export class Pool {
 }
 
 export class Invitations {
-	public invitations: Pooler[];
-	constructor(invitations: Pooler[]) {
+	public invitations: Invitation[];
+	constructor(invitations: Invitation[]) {
 		this.invitations = invitations;
 	}
 	static instance = new Invitations([]);
@@ -239,6 +239,10 @@ export class WSC {
 	}
 
 	// ? Protocole Message Builders
+	ErrorMessage(error: string) {
+		return JSON.stringify(new Message({ event: 'ERROR', object: new WSError(error) }));
+	}
+
 	ConnectMessage(username: string, img: string, page: string, query: string): string {
 		return JSON.stringify(new Message({ event: 'CONNECT', object: new Connect(username, img, page, query) }));
 	}
@@ -250,9 +254,6 @@ export class WSC {
 	}
 	HookMessage(up: boolean, down: boolean): string {
 		return JSON.stringify(new Message({ event: 'HOOK', object: new Hook(up, down) }));
-	}
-	ErrorMessage(error: string) {
-		return JSON.stringify(new Message({ event: 'ERROR', object: new WSError(error) }));
 	}
 }
 
