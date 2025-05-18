@@ -1,5 +1,5 @@
 import { Ball, Paddle, Vector } from './protocole/game/index.js';
-import { WS, Message, Frame, Start, Stop, Pool, Won, Lost, Score, WSError, Invitations, Hash } from './protocole/ws-server.js';
+import { WS, Message, Frame, Start, Stop, Pool, Won, Lost, Score, WSError, Invitations, Hash, Pooler, Invitation } from './protocole/ws-server.js';
 
 let message;
 let messageJson;
@@ -15,10 +15,10 @@ console.log('---------------------------------------------------');
 // ! Pool -----------------------------------------------------------
 message = WS.InvitationMessage(function () {
 	return [
-		{ sender: 'salam', recipient: '3alam' },
-		{ sender: 'kalam', recipient: 'salam' },
-		{ sender: '3alam', recipient: 'kalam' },
-	];
+		{ username: 'salam', img: '.img', invite_status: 'accepted' },
+		{ username: 'kalam', img: '.img', invite_status: 'declined' },
+		{ username: '3alam', img: '.img', invite_status: 'pending' },
+	] as Invitation[];
 });
 messageJson = WS.Json({ message: message, target: Message.instance });
 console.log(messageJson);

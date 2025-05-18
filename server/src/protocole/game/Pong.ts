@@ -2,38 +2,39 @@ import { Paddle } from './Paddle.js';
 import { Ball } from './Ball.js';
 import { Vector } from './Vector.js';
 import { Wall } from './Wall.js';
+import { BlobOptions } from 'buffer';
 
-const friction = 0.05;
+const friction: number = 0.05;
 
-export function randInt(min, max) {
+export function randInt(min: number, max: number): number {
 	return Math.floor(Math.random() * (max - min + 1)) + min;
 }
 
 class Keys {
-	UP_R = false;
-	DOWN_R = false;
-	UP_L = false;
-	DOWN_L = false;
+	public UP_R: boolean = false;
+	public DOWN_R: boolean = false;
+	public UP_L: boolean = false;
+	public DOWN_L: boolean = false;
 }
 
 export class Pong {
-	gaming = true;
-	keys = new Keys();
-	ballRadius = 10; // * Customizable
-	paddleHeight = 60; // * Customizable
-	paddleRadius = 10; // * Customizable
-	paddleDistance = 15; // * Customizable
-	TopWall = new Wall({ start: new Vector(0, 0), end: new Vector(0, 0) });
-	RightWall = new Wall({ start: new Vector(0, 0), end: new Vector(0, 0) });
-	BottomWall = new Wall({ start: new Vector(0, 0), end: new Vector(0, 0) });
-	LeftWall = new Wall({ start: new Vector(0, 0), end: new Vector(0, 0) });
-	ball = new Ball({ pos: new Vector(0, 0), radius: 0, velocity: new Vector(0, 0) });
-	rightPaddle = new Paddle({ start: new Vector(0, 0), end: new Vector(0, 0), radius: 0, constrains: new Vector(0, 0) });
-	leftpaddle = new Paddle({ start: new Vector(0, 0), end: new Vector(0, 0), radius: 0, constrains: new Vector(0, 0) });
+	public gaming: boolean = true;
+	public keys: Keys = new Keys();
+	public ballRadius: number = 10; // * Customizable
+	public paddleHeight: number = 60; // * Customizable
+	public paddleRadius: number = 10; // * Customizable
+	public paddleDistance: number = 15; // * Customizable
+	public TopWall: Wall = new Wall({ start: new Vector(0, 0), end: new Vector(0, 0) });
+	public RightWall: Wall = new Wall({ start: new Vector(0, 0), end: new Vector(0, 0) });
+	public BottomWall: Wall = new Wall({ start: new Vector(0, 0), end: new Vector(0, 0) });
+	public LeftWall: Wall = new Wall({ start: new Vector(0, 0), end: new Vector(0, 0) });
+	public ball: Ball = new Ball({ pos: new Vector(0, 0), radius: 0, velocity: new Vector(0, 0) });
+	public rightPaddle: Paddle = new Paddle({ start: new Vector(0, 0), end: new Vector(0, 0), radius: 0, constrains: new Vector(0, 0) });
+	public leftpaddle: Paddle = new Paddle({ start: new Vector(0, 0), end: new Vector(0, 0), radius: 0, constrains: new Vector(0, 0) });
 
 	constructor() {}
 
-	setup(width, height) {
+	setup(width: number, height: number): void {
 		// * Create Walls
 		this.TopWall = new Wall({ start: new Vector(5, 0), end: new Vector(width - 5, 0) });
 		this.RightWall = new Wall({ start: new Vector(width - 5, 0), end: new Vector(width - 5, height) });
@@ -69,7 +70,7 @@ export class Pong {
 			velocity: new Vector(1 * Math.cos(angle / 100), 1 * Math.sin(angle / 100)).unit(),
 		});
 	}
-	keyPressRight(up, down) {
+	keyPressRight(up: boolean, down: boolean): void {
 		if (up) this.keys.UP_R = true;
 		else this.keys.UP_R = false;
 		if (down) this.keys.DOWN_R = true;
@@ -77,7 +78,7 @@ export class Pong {
 
 		this.rightPaddle.move(up, down);
 	}
-	keyPressLeft(up, down) {
+	keyPressLeft(up: boolean, down: boolean): void {
 		if (up) this.keys.UP_R = true;
 		else this.keys.UP_R = false;
 		if (down) this.keys.DOWN_R = true;
@@ -86,7 +87,7 @@ export class Pong {
 		this.leftpaddle.move(up, down);
 	}
 
-	upddateBall() {
+	upddateBall(): void {
 		if (this.collision_ball_paddle(this.ball, this.rightPaddle)) {
 			this.penetration_resolution_ball_paddle(this.ball, this.rightPaddle);
 			this.collision_response_ball_paddle(this.ball, this.rightPaddle);
@@ -115,7 +116,7 @@ export class Pong {
 		}
 		this.ball.reposition();
 	}
-	updatePaddles() {
+	updatePaddles(): void {
 		// TODO: needs morework
 		// TODO: collision detection
 		// TODO: penetration resolution
@@ -125,7 +126,7 @@ export class Pong {
 	}
 
 	// * Collisions
-	closestPointOnLineSigment(point, wall) {
+	closestPointOnLineSigment(point: Vector, wall: Wall): Vector {
 		// * check if the ball is before the line segment
 		const ballToWallStart = wall.start.subtr(point);
 		if (Vector.dot(wall.dir, ballToWallStart) > 0) return wall.start;
@@ -139,37 +140,37 @@ export class Pong {
 	}
 
 	// * Collision Ball Wall
-	collision_detection_ball_wall(ball, wall) {
+	collision_detection_ball_wall(ball: Ball, wall: Wall): Boolean {
 		const ballToClosest = this.closestPointOnLineSigment(ball.pos, wall).subtr(ball.pos);
 		const penVect = ball.pos.subtr(this.closestPointOnLineSigment(ball.pos, wall));
 		if (Vector.dot(penVect, wall.dir.normal()) < 0) return true;
 		if (ballToClosest.mag() <= ball.radius) return true;
 		return false;
 	}
-	penetration_resolution_ball_wall(ball, wall) {
+	penetration_resolution_ball_wall(ball: Ball, wall: Wall): void {
 		let penVect = ball.pos.subtr(this.closestPointOnLineSigment(ball.pos, wall));
 		if (Vector.dot(penVect, wall.dir.normal()) < 0) penVect = penVect.normal().normal();
 		ball.pos = ball.pos.add(penVect.unit().mult(ball.radius - penVect.mag()));
 	}
-	collision_response_ball_wall(ball, wall) {
+	collision_response_ball_wall(ball: Ball, wall: Wall): void {
 		const normal = ball.pos.subtr(this.closestPointOnLineSigment(ball.pos, wall)).unit();
 		ball.velocity = ball.velocity.subtr(normal.mult(2 * Vector.dot(ball.velocity, normal)));
 	}
 
 	// * Collision Ball Paddle
-	collision_ball_paddle(ball, paddle) {
+	collision_ball_paddle(ball: Ball, paddle: Paddle): boolean {
 		const wall = new Wall({ start: paddle.start, end: paddle.end });
 		const ballToClosest = this.closestPointOnLineSigment(ball.pos, wall);
 		const distance = ballToClosest.subtr(ball.pos).mag();
 		if (distance < paddle.radius + ball.radius) return true;
 		return false;
 	}
-	penetration_resolution_ball_paddle(ball, paddle) {
+	penetration_resolution_ball_paddle(ball: Ball, paddle: Paddle): void {
 		const wall = new Wall({ start: paddle.start, end: paddle.end });
 		const penVect = ball.pos.subtr(this.closestPointOnLineSigment(ball.pos, wall));
 		ball.pos = ball.pos.add(penVect.unit().mult(ball.radius + paddle.radius - penVect.mag()));
 	}
-	collision_response_ball_paddle(ball, paddle) {
+	collision_response_ball_paddle(ball: Ball, paddle: Paddle): void {
 		const wall = new Wall({ start: paddle.start, end: paddle.end });
 		const normal = ball.pos.subtr(this.closestPointOnLineSigment(ball.pos, wall)).unit();
 		ball.velocity = ball.velocity.subtr(normal.mult(Vector.dot(ball.velocity, normal)).mult(2)).mult(1 + paddle.acc.unit().mag() * 0.2);
@@ -182,7 +183,7 @@ export class Pong {
 	}
 
 	// * Main Frame
-	updateFrame(frames) {
+	updateFrame(frames: any) {
 		this.upddateBall();
 		this.updatePaddles();
 	}

@@ -3,16 +3,41 @@ import { Ball, Vector, Paddle } from './game/index.js';
 import _ from 'lodash';
 
 // ! shared ------------------------------------------------------------------------------------------
+interface MessageProps {
+	event: string;
+	object: any;
+}
 export class Message {
-	constructor({ event, object }) {
+	public message: string;
+	public data: string;
+	constructor({ event, object }: MessageProps) {
 		this.message = event;
 		this.data = JSON.stringify(object);
 	}
 	static instance = new Message({ event: '', object: {} });
 }
 
+export class Pooler {
+	public username: string;
+	public profile: string;
+	constructor(username: string, profile: string) {
+		this.username = username;
+		this.profile = profile;
+	}
+	static instance = new Pooler('', '');
+}
+
+export class Invitation {
+	public username: string = '';
+	public img: string = '';
+	public invite_status: string = '';
+	constructor() {}
+	static instance = new Invitation();
+}
+
 export class WSError {
-	constructor(error) {
+	public message: string;
+	constructor(error: string) {
 		this.message = error;
 	}
 	static instance = new WSError('');
@@ -22,7 +47,10 @@ export class WSError {
 
 // * Pool
 export class Hash {
-	constructor(username, img, hash) {
+	public username: string;
+	public img: string;
+	public hash: string;
+	constructor(username: string, img: string, hash: string) {
 		this.username = username;
 		this.hash = hash;
 		this.img = img;
@@ -30,23 +58,17 @@ export class Hash {
 	static instance = new Hash('', '', '');
 }
 
-export class Pooler {
-	constructor(username, img) {
-		this.username = username;
-		this.img = img;
-	}
-	static instance = new Pooler('', '');
-}
-
 export class Pool {
-	constructor(pool) {
+	public pool: Pooler[];
+	constructor(pool: Pooler[]) {
 		this.pool = pool;
 	}
 	static instance = new Pool([]);
 }
 
 export class Invitations {
-	constructor(invitations) {
+	public invitations: Invitation[];
+	constructor(invitations: Invitation[]) {
 		this.invitations = invitations;
 	}
 	static instance = new Invitations([]);
@@ -54,17 +76,19 @@ export class Invitations {
 
 // * Game
 export class Start {
+	public start: string;
 	constructor() {
 		this.start = 'START';
 	}
-	static instance = new Start();
+	public static instance = new Start();
 }
 
 export class Stop {
+	public stop: string;
 	constructor() {
 		this.stop = 'STOP';
 	}
-	static instance = new Stop();
+	public static instance = new Stop();
 }
 
 export class Frame {
@@ -80,7 +104,7 @@ export class Frame {
 	leftPaddleBottomY;
 	rightPaddleBottomX;
 	rightPaddleBottomY;
-	constructor(ball, rightPaddle, leftPaddle) {
+	constructor(ball: Ball, rightPaddle: Paddle, leftPaddle: Paddle) {
 		this.ballRadius = Math.ceil(ball.radius);
 		this.paddleRadius = Math.ceil(rightPaddle.radius);
 		this.ballX = Math.ceil(ball.pos.x);
@@ -102,7 +126,9 @@ export class Frame {
 }
 
 export class Score {
-	constructor(player, opponent) {
+	public player: number;
+	public opponent: number;
+	constructor(player: number, opponent: number) {
 		this.player = player;
 		this.opponent = opponent;
 	}
@@ -110,6 +136,7 @@ export class Score {
 }
 
 export class Lost {
+	public lost: string;
 	constructor() {
 		this.lost = 'LOST';
 	}
@@ -117,85 +144,102 @@ export class Lost {
 }
 
 export class Won {
+	public won: string;
 	constructor() {
 		this.won = 'WON';
 	}
 	static instance = new Won();
 }
-
 // ! req -------------------------------------------------------------------------
 
 // * Pool
 export class Connect {
 	// TODO: initial game data can be added here
-	constructor(username, img, page, query) {
+	username: string;
+	img: string;
+	page: string;
+	query: string;
+	constructor(username: string, img: string, page: string, query: string) {
 		this.username = username;
 		this.query = query;
 		this.page = page;
 		this.img = img;
 	}
-	static instance = new Connect('');
+	public static instance = new Connect('', '', '', '');
 }
 
 export class Invite {
-	constructor(sender, recipient) {
+	sender: string;
+	recipient: string;
+	constructor(sender: string, recipient: string) {
 		this.sender = sender;
 		this.recipient = recipient;
 	}
-	static instance = new Invite('', '');
+	public static instance = new Invite('', '');
 }
 
 export class Accept {
-	constructor(sender, recipient) {
+	sender: string;
+	recipient: string;
+	constructor(sender: string, recipient: string) {
 		this.sender = sender;
 		this.recipient = recipient;
 	}
-	static instance = new Accept('', '');
+	public static instance = new Accept('', '');
 }
 
 export class Reject {
-	constructor(sender, recipient) {
+	sender: string;
+	recipient: string;
+	constructor(sender: string, recipient: string) {
 		this.sender = sender;
 		this.recipient = recipient;
 	}
-	static instance = new Reject('', '');
+	public static instance = new Reject('', '');
 }
 
 export class Delete {
-	constructor(sender, recipient) {
+	sender: string;
+	recipient: string;
+	constructor(sender: string, recipient: string) {
 		this.sender = sender;
 		this.recipient = recipient;
 	}
-	static instance = new Reject('', '');
+	public static instance = new Delete('', '');
 }
 
 // * Game
 export class Hook {
-	constructor(up, down) {
+	up: boolean;
+	down: boolean;
+	constructor(up: boolean, down: boolean) {
 		this.up = up;
 		this.down = down;
 	}
-	static instance = new Hook(false, false);
+	public static instance = new Hook(false, false);
 }
 
 // ! Protocole ------------------------------------------------------------------------------
 
+interface JsonProps {
+	message: string;
+	// eslint-disable-next-line @typescript-eslint/no-explicit-any
+	target: any;
+}
 class WSS {
-	static #insance;
-
+	private static instance: WSS | null;
 	constructor() {
-		if (WSS.#insance) return WSS.#insance;
-		WSS.#insance = this;
+		if (WSS.instance) return WSS.instance;
+		WSS.instance = this;
 	}
 
 	// * frame, start, stop, pool, score, won, lost, invitations, error
 
 	// ? Comminication Helpers
-	Json({ message, target }) {
+	Json({ message, target }: JsonProps) {
 		const json = JSON.parse(message);
 		const properties = Object.getOwnPropertyNames(json);
-		const targetProperties = Object.getOwnPropertyNames(target);
-		targetProperties.forEach((property) => {
+		Object.getOwnPropertyNames(target).forEach((property) => {
 			if (_.includes(properties, property) === false) throw new Error('Invalid JSON');
 		});
 		return json;
@@ -203,36 +247,37 @@ class WSS {
 
 	// ? Protocole Message Builders
 
-	ErrorMessage(error) {
+	ErrorMessage(error: string) {
 		return JSON.stringify(new Message({ event: 'ERROR', object: new WSError(error) }));
 	}
+
 	// * POOL
-	HashMessage(username, img, hash) {
+	HashMessage(username: string, img: string, hash: string): string {
 		return JSON.stringify(new Message({ event: 'Hash', object: new Hash(username, img, hash) }));
 	}
-	PoolMessage(getPoolers) {
+	PoolMessage(getPoolers: () => Pooler[]): string {
 		return JSON.stringify(new Message({ event: 'POOL', object: new Pool(getPoolers()) }));
 	}
-	InvitationMessage(getInvitions) {
+	InvitationMessage(getInvitions: () => Invitation[]): string {
 		return JSON.stringify(new Message({ event: 'INVITATIONS', object: new Invitations(getInvitions()) }));
 	}
 	// * GAME
-	StartMessage() {
+	StartMessage(): string {
 		return JSON.stringify(new Message({ event: 'START', object: new Start() }));
 	}
-	StopMessage() {
+	StopMessage(): string {
 		return JSON.stringify(new Message({ event: 'STOP', object: new Stop() }));
 	}
-	FrameMessage(ball, rightPaddle, leftPaddle) {
+	FrameMessage(ball: Ball, rightPaddle: Paddle, leftPaddle: Paddle) {
 		return JSON.stringify(new Message({ event: 'FRAME', object: new Frame(ball, rightPaddle, leftPaddle) }));
 	}
-	ScoreMessage(player, opponent) {
+	ScoreMessage(player: number, opponent: number): string {
 		return JSON.stringify(new Message({ event: 'SCORE', object: new Score(player, opponent) }));
 	}
-	LostMessage() {
+	LostMessage(): string {
 		return JSON.stringify(new Message({ event: 'LOST', object: new Lost() }));
 	}
-	WonMessage() {
+	WonMessage(): string {
 		return JSON.stringify(new Message({ event: 'WON', object: new Won() }));
 	}
 }
