@@ -133,8 +133,8 @@ export class Pool {
 }
 
 export class Invitations {
-	public invitations: User[];
-	constructor(invitations: User[]) {
+	public invitations: Pooler[];
+	constructor(invitations: Pooler[]) {
 		this.invitations = invitations;
 	}
 	static instance = new Invitations([]);
@@ -175,6 +175,18 @@ export class Score {
 	static instance = new Score(0, 0);
 }
 
+export class Play
+{
+	username: string;
+	opponent: string;
+	constructor(username: string, opponent: string)
+	{
+		this.username = username;
+		this.opponent = opponent;
+	}
+	public static instance = new Play('', '');
+}
+
 export class Start {
 	public start: string;
 	constructor() {
@@ -207,7 +219,7 @@ interface JsonProps {
 	target: any;
 }
 
-class WSC {
+export class WSC {
 	private static instance: WSC | null;
 	constructor() {
 		if (WSC.instance) return WSC.instance;
