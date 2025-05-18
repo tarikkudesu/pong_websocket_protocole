@@ -1,7 +1,7 @@
-import WS, { Message, Connect, Invite, Play, Hook, WSError } from './protocole/ws-client.js';
+import { WS, Message, Connect, Invite, Play, Hook, WSError } from './protocole/ws-client.js';
 
 // ! Connect -----------------------------------------------------------
-const connect: string = WS.ConnectMessage('tarikkudesu');
+const connect: string = WS.ConnectMessage('tarikkudesu', 'img/img', 'PAGE', 'query');
 console.log(connect);
 const connectJson: Message = WS.Json({ message: connect, target: Message.instance });
 console.log(connectJson);
