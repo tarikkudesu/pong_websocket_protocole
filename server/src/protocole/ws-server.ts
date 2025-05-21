@@ -1,38 +1,30 @@
 import { Ball, Vector, Paddle } from './game/index.js';
+// import { mdb } from './mdb.js';
+// import { WebSocket } from 'ws';
+
+// declare module 'ws' {
+// 	interface WebSocket {
+// 		username: string;
+// 		hash: string;
+// 	}
+// }
 
 import _ from 'lodash';
 
 // ! shared ------------------------------------------------------------------------------------------
+
 interface MessageProps {
-	event: string;
-	object: any;
+	message: string;
+	data: any;
 }
 export class Message {
 	public message: string;
 	public data: string;
-	constructor({ event, object }: MessageProps) {
-		this.message = event;
-		this.data = JSON.stringify(object);
+	constructor({ message, data }: MessageProps) {
+		this.message = message;
+		this.data = JSON.stringify(data);
 	}
-	static instance = new Message({ event: '', object: {} });
-}
-
-export class Pooler {
-	public username: string;
-	public img: string;
-	constructor(username: string, img: string) {
-		this.username = username;
-		this.img = img;
-	}
-	static instance = new Pooler('', '');
-}
-
-export class Invitation {
-	public username: string = '';
-	public img: string = '';
-	public invite_status: string = '';
-	constructor() {}
-	static instance = new Invitation();
+	static instance = new Message({ message: '', data: {} });
 }
 
 export class WSError {
@@ -43,13 +35,10 @@ export class WSError {
 	static instance = new WSError('');
 }
 
-// ! res ------------------------------------------------------------------------------------------
-
-// * Pool
 export class Hash {
-	public username: string;
 	public img: string;
 	public hash: string;
+	public username: string;
 	constructor(username: string, img: string, hash: string) {
 		this.username = username;
 		this.hash = hash;
@@ -58,17 +47,45 @@ export class Hash {
 	static instance = new Hash('', '', '');
 }
 
+export class ClientPlayer {
+	public img: string;
+	public username: string;
+	public invite_status: 'unsent' | 'pending' | 'accepted' | 'declined';
+	constructor(username: string, img: string, invite_status: 'unsent' | 'pending' | 'accepted' | 'declined') {
+		this.invite_status = invite_status;
+		this.username = username;
+		this.img = img;
+	}
+	static instance = new ClientPlayer('', '', 'unsent');
+}
+
+export class ClientInvitation {
+	public img: string;
+	public sender: string;
+	public invite_status: 'unsent' | 'pending' | 'accepted' | 'declined';
+	constructor(sender: string, img: string, invite_status: 'unsent' | 'pending' | 'accepted' | 'declined') {
+		this.invite_status = 'pending';
+		this.sender = sender;
+		this.img = img;
+	}
+	static instance = new ClientInvitation('', '', 'unsent');
+}
+
+// ! res ------------------------------------------------------------------------------------------
+
+// * Pool
+
 export class Pool {
-	public pool: Pooler[];
-	constructor(pool: Pooler[]) {
+	public pool: ClientPlayer[];
+	constructor(pool: ClientPlayer[]) {
 		this.pool = pool;
 	}
 	static instance = new Pool([]);
 }
 
 export class Invitations {
-	public invitations: Invitation[];
-	constructor(invitations: Invitation[]) {
+	public invitations: ClientInvitation[];
+	constructor(invitations: ClientInvitation[]) {
 		this.invitations = invitations;
 	}
 	static instance = new Invitations([]);
@@ -155,10 +172,10 @@ export class Won {
 // * Pool
 export class Connect {
 	// TODO: initial game data can be added here
-	username: string;
 	img: string;
 	page: string;
 	query: string;
+	username: string;
 	constructor(username: string, img: string, page: string, query: string) {
 		this.username = username;
 		this.query = query;
@@ -176,36 +193,6 @@ export class Invite {
 		this.recipient = recipient;
 	}
 	public static instance = new Invite('', '');
-}
-
-export class Accept {
-	sender: string;
-	recipient: string;
-	constructor(sender: string, recipient: string) {
-		this.sender = sender;
-		this.recipient = recipient;
-	}
-	public static instance = new Accept('', '');
-}
-
-export class Reject {
-	sender: string;
-	recipient: string;
-	constructor(sender: string, recipient: string) {
-		this.sender = sender;
-		this.recipient = recipient;
-	}
-	public static instance = new Reject('', '');
-}
-
-export class Delete {
-	sender: string;
-	recipient: string;
-	constructor(sender: string, recipient: string) {
-		this.sender = sender;
-		this.recipient = recipient;
-	}
-	public static instance = new Delete('', '');
 }
 
 // * Game
@@ -248,38 +235,95 @@ class WSS {
 	// ? Protocole Message Builders
 
 	ErrorMessage(error: string) {
-		return JSON.stringify(new Message({ event: 'ERROR', object: new WSError(error) }));
+		return JSON.stringify(new Message({ message: 'ERROR', data: new WSError(error) }));
 	}
 
 	// * POOL
 	HashMessage(username: string, img: string, hash: string): string {
-		return JSON.stringify(new Message({ event: 'Hash', object: new Hash(username, img, hash) }));
+		return JSON.stringify(new Message({ message: 'Hash', data: new Hash(username, img, hash) }));
 	}
-	PoolMessage(getPoolers: () => Pooler[]): string {
-		return JSON.stringify(new Message({ event: 'POOL', object: new Pool(getPoolers()) }));
+	PoolMessage(getClientPlayers: () => ClientPlayer[]): string {
+		return JSON.stringify(new Message({ message: 'POOL', data: new Pool(getClientPlayers()) }));
 	}
-	InvitationMessage(getInvitions: () => Invitation[]): string {
-		return JSON.stringify(new Message({ event: 'INVITATIONS', object: new Invitations(getInvitions()) }));
+	InvitationMessage(getInvitions: () => ClientInvitation[]): string {
+		return JSON.stringify(new Message({ message: 'INVITATIONS', data: new Invitations(getInvitions()) }));
 	}
 	// * GAME
 	StartMessage(): string {
-		return JSON.stringify(new Message({ event: 'START', object: new Start() }));
+		return JSON.stringify(new Message({ message: 'START', data: new Start() }));
 	}
 	StopMessage(): string {
-		return JSON.stringify(new Message({ event: 'STOP', object: new Stop() }));
+		return JSON.stringify(new Message({ message: 'STOP', data: new Stop() }));
 	}
 	FrameMessage(ball: Ball, rightPaddle: Paddle, leftPaddle: Paddle) {
-		return JSON.stringify(new Message({ event: 'FRAME', object: new Frame(ball, rightPaddle, leftPaddle) }));
+		return JSON.stringify(new Message({ message: 'FRAME', data: new Frame(ball, rightPaddle, leftPaddle) }));
 	}
 	ScoreMessage(player: number, opponent: number): string {
-		return JSON.stringify(new Message({ event: 'SCORE', object: new Score(player, opponent) }));
+		return JSON.stringify(new Message({ message: 'SCORE', data: new Score(player, opponent) }));
 	}
 	LostMessage(): string {
-		return JSON.stringify(new Message({ event: 'LOST', object: new Lost() }));
+		return JSON.stringify(new Message({ message: 'LOST', data: new Lost() }));
 	}
 	WonMessage(): string {
-		return JSON.stringify(new Message({ event: 'WON', object: new Won() }));
+		return JSON.stringify(new Message({ message: 'WON', data: new Won() }));
 	}
+
+	/************************************************************************************************************************
+	 *                                                        PARSER                                                        *
+	 ************************************************************************************************************************/
+	// useParser(json: string, socket: WebSocket) {
+	// 	const { message, data } = this.Json({ message: json, target: Message.instance });
+	// 	switch (message) {
+	// 		case 'CONNECT': {
+	// 			// TODO: handle connect GAME
+	// 			// ? connect.page = 'MAIN' | 'GAME';
+	// 			const connect: Connect = this.Json({ message: data, target: Connect.instance });
+	// 			if (connect.page === 'MAIN') mdb.addPlayer(connect.username, connect.img, socket);
+	// 			break;
+	// 		}
+	// 		case 'INVITE': {
+	// 			// TODO: handle invite
+	// 			const invite: Invite = this.Json({ message: data, target: Invite.instance });
+	// 			console.log(invite);
+	// 			mdb.createInvitation(invite.sender, invite.recipient);
+	// 			break;
+	// 		}
+	// 		case 'ACCEPT': {
+	// 			// TODO: handle accept
+	// 			const invite: Invite = this.Json({ message: data, target: Invite.instance });
+	// 			mdb.acceptInvitation(invite.sender, invite.recipient);
+	// 			break;
+	// 		}
+	// 		case 'REJECT': {
+	// 			// TODO: handle reject
+	// 			const invite: Invite = this.Json({ message: data, target: Invite.instance });
+	// 			mdb.declineInvitation(invite.sender, invite.recipient);
+	// 			break;
+	// 		}
+	// 		case 'DELETE': {
+	// 			// TODO: handle delete
+	// 			const invite: Invite = this.Json({ message: data, target: Invite.instance });
+	// 			if (invite.recipient === '*') mdb.deleteAllRejectedInvitations(invite.sender);
+	// 			else mdb.deleteRejectedInvitation(invite.sender, invite.recipient);
+	// 			break;
+	// 		}
+	// 		default:
+	// 			throw new Error('Invalid JSON');
+	// 	}
+	// 	mdb.updateClient();
+	// }
+	// closeSocket(socket: WebSocket) {
+	// 	if (socket.username) {
+	// 		mdb.removePlayer(socket.username);
+	// 		mdb.cancelAllPlayerInvitations(socket.username);
+	// 	}
+	// 	mdb.updateClient();
+	// }
+	// main() {
+	// 	setInterval(() => {
+	// 		mdb.updateMdb();
+	// 	}, 1000 / 60);
+	// }
 }
 
 export const WS = new WSS();
